@@ -3,16 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Block Dodger</title>
+<meta name="theme-color" content="#1b3a46">
+<link rel="icon" href="data:,">
+<title>Costa Dorada — an open-world crime story</title>
 <style>
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #11141b; }
-  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
-  /* Read aloud, never shown: the status line screen readers announce. */
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #12232c; }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
+  #loading { position: fixed; inset: 0; display: grid; place-items: center; color: #f6e7c8;
+    font: 500 15px/1.4 "Segoe UI", system-ui, sans-serif; letter-spacing: 4px; text-transform: uppercase;
+    background: #12232c; transition: opacity .4s ease; }
+  #loading.gone { display: none; }
   #status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 </style>
 </head>
 <body>
-<canvas id="game" aria-label="Block Dodger: move the paddle left and right to dodge falling blocks and catch coins"></canvas>
+<canvas id="game" aria-label="Costa Dorada, an open-world crime game: a sunlit coastal city seen from above, where you walk, drive, steal cars, take missions and outrun the police"></canvas>
+<div id="loading">loading costa dorada</div>
 <p id="status" role="status" aria-live="polite"></p>
 <script type="module" src="./src/main.js"></script>
 </body>
