@@ -1,3 +1,4 @@
+// sprint-3d witness
 // Save and resume: cash, reputation, which job is next, where the player stands.
 import { SAVE_KEY } from './config.js';
 

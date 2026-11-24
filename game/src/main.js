@@ -1,3 +1,4 @@
+// sprint-3d witness
 // Costa Dorada: wires the city, the crowd, the traffic, the player, the police and the story into one
 // loop, then keeps the frame going. It owns the title and pause overlays, the wasted and busted
 // respawns, the save file, and the four staged screenshot scenes reached with ?shot=.
@@ -11,7 +12,9 @@ import { createPlayer, updatePlayer } from './player.js';
 import { createPolice } from './police.js';
 import { createMissions } from './missions.js';
 import { createRenderer } from './render.js';
+import { createRenderer3D } from './render3d.js';
 import { createHud } from './hud.js';
+import { drawTitlePage, drawMapPage, drawGaragePage } from './pages.js';
 import { loadSave, saveGame } from './save.js';
 import { stageShot } from './shots.js';
 import { stepBullets } from './combat.js';
@@ -19,11 +22,12 @@ import { clamp, createRandom } from './math.js';
 
 const params = new URLSearchParams(window.location.search);
 const shot = params.get('shot');
+const pageShot = shot === 'title' || shot === 'map' || shot === 'garage' ? shot : null;
 const seed = Number(params.get('seed') ?? SHOT_SEED) || SHOT_SEED;
 
 const canvas = document.getElementById('game');
 const city = createCity(seed);
-const renderer = createRenderer(canvas, city);
+const renderer = params.get('render') === '2d' ? createRenderer(canvas, city) : createRenderer3D(canvas, city);
 renderer.resize(window.innerWidth, window.innerHeight, Math.min(2, window.devicePixelRatio || 1));
 
 const input = createInput(canvas);
@@ -110,7 +114,13 @@ game.hud = createHud(canvas, city, renderer.view);
 window.__costa = game;
 
 if (shot) {
-  stageShot(game, shot);
+  const stage = pageShot === 'title' ? 'cover' : pageShot === 'garage' ? 'cruise' : pageShot === 'map' ? 'cover' : shot;
+  stageShot(game, stage);
+  if (pageShot === 'title') game.state = 'title';
+  if (pageShot === 'map' || pageShot === 'garage') {
+    game.state = 'playing';
+    game.missions.completed = pageShot === 'map' ? 2 : 3;
+  }
   game.mouseScreen = { x: renderer.view.w * 0.62, y: renderer.view.h * 0.42 };
 } else {
   const saved = loadSave();
@@ -181,10 +191,9 @@ function updatePlaying(dt) {
     return;
   }
 
-  game.aim = {
-    x: renderer.camera.x + (input.mouse.x - renderer.view.w / 2),
-    y: renderer.camera.y + (input.mouse.y - renderer.view.h / 2),
-  };
+  game.aim = renderer.screenToWorld
+    ? renderer.screenToWorld(input.mouse.x, input.mouse.y)
+    : { x: renderer.camera.x + (input.mouse.x - renderer.view.w / 2), y: renderer.camera.y + (input.mouse.y - renderer.view.h / 2) };
   game.mouseScreen = { x: input.mouse.x, y: input.mouse.y };
 
   updatePlayer(game.player, game, input, dt, game.aim);
@@ -230,34 +239,16 @@ function drawOverlay() {
     ctx.fillText(`player ${game.player.x.toFixed(0)},${game.player.y.toFixed(0)}  focus ${game.focus.x.toFixed(0)},${game.focus.y.toFixed(0)}  cam ${renderer.camera.x.toFixed(0)},${renderer.camera.y.toFixed(0)}  inCar ${game.player.inCar?.type ?? 'none'}`, 12, 74);
   }
 
+  if (pageShot === 'map') {
+    drawMapPage(ctx, w, h, game, city);
+    return;
+  }
+  if (pageShot === 'garage') {
+    drawGaragePage(ctx, w, h, game);
+    return;
+  }
   if (game.state === 'title') {
-    const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, 'rgba(8,16,20,0.35)');
-    grad.addColorStop(0.55, 'rgba(8,16,20,0.62)');
-    grad.addColorStop(1, 'rgba(8,16,20,0.85)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'rgba(8,12,16,0.6)';
-    ctx.font = 'bold 66px Georgia, serif';
-    ctx.fillText('COSTA DORADA', w / 2 + 3, h * 0.3 + 3);
-    ctx.fillStyle = '#f6c96a';
-    ctx.fillText('COSTA DORADA', w / 2, h * 0.3);
-    ctx.fillStyle = '#f4ead6';
-    ctx.font = 'italic 19px Georgia, serif';
-    ctx.fillText('an open-world crime story on the sunlit coast', w / 2, h * 0.3 + 58);
-    ctx.font = 'bold 11px Verdana, sans-serif';
-    ctx.fillStyle = 'rgba(244,234,214,0.65)';
-    ctx.fillText('WASD WALK  ·  MOUSE AIM  ·  CLICK FIRE  ·  F ENTER / EXIT VEHICLES  ·  SPACE HANDBRAKE  ·  ESC PAUSE', w / 2, h * 0.55);
-    ctx.fillStyle = '#f6c96a';
-    const blink = 0.55 + 0.45 * Math.sin(game.time * 3);
-    ctx.font = 'bold 16px Verdana, sans-serif';
-    ctx.fillStyle = `rgba(246,201,106,${blink})`;
-    ctx.fillText('CLICK TO START', w / 2, h * 0.67);
-    ctx.fillStyle = 'rgba(244,234,214,0.45)';
-    ctx.font = '10px Verdana, sans-serif';
-    ctx.fillText('FIVE JOBS  ·  ELEVEN CITY BLOCKS  ·  FREE ROAM  ·  AN ORIGINAL MAKE.FUN ENTRY', w / 2, h * 0.8);
+    drawTitlePage(ctx, w, h, game);
   } else if (game.state === 'paused') {
     ctx.fillStyle = 'rgba(6,11,14,0.7)';
     ctx.fillRect(0, 0, w, h);
@@ -321,7 +312,8 @@ function frame(now) {
   if (shot) {
     game.view = renderer.view;
     renderer.draw(game);
-    game.hud.draw(game, 0);
+    if (!pageShot) game.hud.draw(game, 0);
+    drawOverlay();
     if (params.get('debug')) {
       const ctx = canvas.getContext('2d');
       const dpr = canvas.width / renderer.view.w;

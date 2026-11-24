@@ -1,3 +1,4 @@
+// sprint-3d witness
 // Four staged scenes for the four screenshots: each one puts the player, the traffic, the cops, the
 // crew and the job objective where the camera can read them together. A shot URL turns the game into
 // a still, so the same code that plays also poses.
@@ -35,7 +36,7 @@ function trafficCar(game, type, x, y, angle, color, cruise = 110) {
 }
 
 function copCar(game, x, y, angle) {
-  const car = createCar('police', x, y, angle, '#f2f1e8', { kind: 'police', siren: true });
+  const car = createCar('police', x, y, angle, '#202b4a', { kind: 'police', siren: true });
   car.health = 170;
   game.cars.push(car);
   game.police.units.push({ kind: 'car', car, x, y, health: 170, dead: false, shootTimer: 9, stuck: 0, lastX: x, lastY: y });
@@ -98,14 +99,14 @@ export function stageShot(game, kind) {
     const y = 1500;
     const spyder = placePlayerInCar(game, 'sports', x, y, Math.PI / 2, '#d64230', 300);
     spyder.health = 82;
-    copCar(game, x, 1380, Math.PI / 2);
-    copCar(game, x, 1315, Math.PI / 2);
-    copCar(game, 4049, 1430, -Math.PI / 2);
-    footCop(game, 3978, 1608, Math.PI * 0.75);
-    trafficCar(game, 'sedan', x, 1660, Math.PI / 2, '#d9d4c7', 120);
-    trafficCar(game, 'taxi', 4049, 1580, -Math.PI / 2, '#e8b83a', 105);
-    trafficCar(game, 'van', x, 1760, Math.PI / 2, '#8fb3c9', 110);
-    trafficCar(game, 'pickup', 4049, 1700, -Math.PI / 2, '#7d9b76', 95);
+    copCar(game, x + 84, 1760, Math.PI / 2);
+    copCar(game, x - 80, 1800, Math.PI / 2);
+    copCar(game, 4049, 1745, -Math.PI / 2);
+    footCop(game, 3978, 1568, Math.PI * 0.75);
+    trafficCar(game, 'sedan', x, 1740, Math.PI / 2, '#d9d4c7', 120);
+    trafficCar(game, 'taxi', 4049, 1650, -Math.PI / 2, '#e8b83a', 105);
+    trafficCar(game, 'van', x, 1820, Math.PI / 2, '#8fb3c9', 110);
+    trafficCar(game, 'pickup', 4049, 1760, -Math.PI / 2, '#7d9b76', 95);
     peds.slice(0, 6).forEach((ped, i) => {
       ped.dead = false;
       ped.x = 4112 + (i * 47) % 92;
@@ -118,21 +119,22 @@ export function stageShot(game, kind) {
     game.focus = { x: 4012, y: 1448 };
     game.player.health = 88;
   } else if (kind === 'onfoot') {
-    game.player.x = 900;
-    game.player.y = 1688;
-    game.player.angle = -0.28;
+    // Plaza centre, facing east: the player is central, the crew is 80–140 units directly ahead.
+    game.player.x = 960;
+    game.player.y = 1680;
+    game.player.angle = 0;
     game.player.health = 72;
     game.player.armor = 45;
     game.player.muzzle = 0.04;
-    crew(game, 1044, 1648);
-    crew(game, 1104, 1724);
-    crew(game, 1012, 1782);
-    const boss = crew(game, 1120, 1836, true);
+    crew(game, 1090, 1650);
+    crew(game, 1105, 1720);
+    crew(game, 1085, 1760);
+    const boss = crew(game, 1110, 1690, true);
     boss.health = 140;
     copCar(game, 1180, 1860, Math.PI);
     footCop(game, 1090, 1860, Math.PI);
     game.police.setStars(2);
-    setMission(game, 1, 1, { ...city.landmarks.warehouse, kind: 'kill' }, 2, 5);
+    setMission(game, 1, 1, { x: 1120, y: 1680, kind: 'kill' }, 2, 5);
     const dead = peds.find((p) => !p.dead);
     if (dead) {
       dead.dead = true;
@@ -151,9 +153,9 @@ export function stageShot(game, kind) {
       ped.angle = Math.PI;
     });
     game.effects.blood(1044, 1652, 0.3);
-    game.effects.muzzle(912, 1680, -0.28);
-    game.bullets.push({ x: 938, y: 1692, vx: 900, vy: -240, life: 0.6, damage: 26, owner: 'player' });
-    game.focus = { x: 968, y: 1700 };
+    game.effects.muzzle(972, 1680, 0);
+    game.bullets.push({ x: 990, y: 1682, vx: 900, vy: 0, life: 0.6, damage: 26, owner: 'player' });
+    game.focus = { x: 1000, y: 1700 };
   } else if (kind === 'cruise') {
     const x = 3991;
     const y = 2330;

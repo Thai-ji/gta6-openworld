@@ -13,23 +13,23 @@ MAX_BYTES = 262_144
 WIDTH, HEIGHT = 1280, 720
 
 
-SHOTS = {"cover", "onfoot", "cruise", "heist"}
+SHOTS = [("cover", "01-cover"), ("onfoot", "02-action"), ("map", "03-progression"), ("title", "04-title")]
 
 
 def main(raw_dir: Path, out_dir: Path) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
-    sources = [p for p in sorted(raw_dir.glob("*.png")) if p.stem in SHOTS]
+    sources = [(raw_dir / f"{stem}.png", name) for stem, name in SHOTS if (raw_dir / f"{stem}.png").exists()]
     if len(sources) != 4:
         print(f"expected 4 raw pngs, found {len(sources)}", file=sys.stderr)
         return 1
 
-    for index, source in enumerate(sources, start=1):
+    for source, name in sources:
         image = Image.open(source).convert("RGB")
         if image.width < WIDTH or image.height < HEIGHT:
             print(f"{source.name}: too small at {image.size}", file=sys.stderr)
             return 1
         image = image.crop((0, 0, WIDTH, HEIGHT))
-        target = out_dir / f"{index:02d}-{source.stem}.jpg"
+        target = out_dir / f"{name}.jpg"
         size = 0
         for quality in (86, 82, 78, 74, 70, 66, 62):
             image.save(target, "JPEG", quality=quality, optimize=True, progressive=True)

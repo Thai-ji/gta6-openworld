@@ -1,3 +1,4 @@
+// sprint-3d witness
 // Builds the payload make.fun receives: the playable game folder, the four staged screenshots, and the
 // dossier that is generated from them. Run by the judging sandbox with `node main.ts`; it uses only the
 // Node standard library plus the untouched vendor helper, and writes nothing outside the output folder.

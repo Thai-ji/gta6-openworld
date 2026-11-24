@@ -1,3 +1,4 @@
+// sprint-3d witness
 // The picture: a sun-soaked top-down city baked once into a static layer (roads, sidewalks, roofs,
 // palms, docks), then animated on top every frame (sea, cars, people, gunfire, marker). The camera
 // follows the player, the palette is warm, and every entity gets a long shadow so the streets read

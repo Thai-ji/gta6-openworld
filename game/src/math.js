@@ -1,3 +1,4 @@
+// sprint-3d witness
 // Small geometry and randomness helpers shared by the simulation: distances, angles, a seeded
 // generator so a screenshot scene is the same every run, and the easing the camera uses.
 export const TAU = Math.PI * 2;

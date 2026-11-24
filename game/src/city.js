@@ -1,3 +1,4 @@
+// sprint-3d witness
 // The city itself: an 11 by 8 grid of blocks around a road network, three districts of different
 // height and colour, a beach and the sea on the east side, and the landmarks the story uses. It
 // generates every building, palm, lamp, parked car and collision box from one seed, and answers the

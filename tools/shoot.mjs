@@ -12,7 +12,7 @@ const RAW = join(ROOT, 'shots-raw');
 const OUT = join(ROOT, 'screenshots');
 const PORT = Number(process.env.SHOT_PORT ?? 4399);
 const CHROME = process.env.CHROME_PATH ?? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const SHOTS = ['cover', 'onfoot', 'cruise', 'heist'];
+const SHOTS = ['cover', 'onfoot', 'map', 'title'];
 
 mkdirSync(RAW, { recursive: true });
 if (!existsSync(CHROME)) {

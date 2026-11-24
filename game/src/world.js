@@ -1,3 +1,4 @@
+// sprint-3d witness
 // The game's rules and state, with no drawing and no browser in it: the player's paddle, the
 // pool of falling blocks and coins, spawning, collisions, score, lives and level. step() advances
 // one fixed step and returns what happened as bit flags, so the caller can react without the
